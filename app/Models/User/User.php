@@ -85,6 +85,10 @@ class User extends Authenticatable implements MustVerifyEmail
      */
     public static function createDefault($account_id, $first_name, $last_name, $email, $password, $ipAddress = null, $lang = null)
     {
+        if (User::where('email', $email)->count() > 0) {
+            throw new \App\Exceptions\ExistingUserException;
+        }
+
         // create the user
         $user = new self;
         $user->account_id = $account_id;

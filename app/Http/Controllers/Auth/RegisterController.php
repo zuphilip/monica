@@ -83,21 +83,26 @@ class RegisterController extends Controller
      * Create a new user instance after a valid registration.
      *
      * @param  array $data
-     * @return User
+     * @return User|null
      */
     protected function create(array $data)
     {
         $this->validator($data)->validate();
 
-        $first = ! Account::hasAny();
-        $account = Account::createDefault(
-            $data['first_name'],
-            $data['last_name'],
-            $data['email'],
-            $data['password'],
-            RequestHelper::ip(),
-            $data['lang']
-        );
+        try {
+            $first = ! Account::hasAny();
+            $account = Account::createDefault(
+                $data['first_name'],
+                $data['last_name'],
+                $data['email'],
+                $data['password'],
+                RequestHelper::ip(),
+                $data['lang']
+            );
+        } catch (\App\Exceptions\ExistingUserException $e) {
+            return;
+        }
+
         $user = $account->users()->first();
 
         if (! $first) {
@@ -123,8 +128,6 @@ class RegisterController extends Controller
             $user->markEmailAsVerified();
 
             $this->guard()->login($user);
-
-            return redirect()->route('login');
         }
     }
 }

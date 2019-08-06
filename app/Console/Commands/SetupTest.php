@@ -35,6 +35,8 @@ class SetupTest extends Command
 
         $this->artisan('✓ Performing migrations', 'migrate:fresh');
 
+        $this->artisan('✓ Filling database standard data', 'db:seed');
+
         $this->artisan('✓ Symlink the storage folder', 'storage:link');
 
         if (! $this->option('skipSeed')) {
